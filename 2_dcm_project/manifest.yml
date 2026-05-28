@@ -1,0 +1,40 @@
+manifest_version: 2
+
+type: DCM_PROJECT
+
+default_target: DCM_DEV
+
+targets:
+  DCM_DEV:
+    account_identifier: SFPSCOGS-OVI_HUTU_AWS_EU_CENTRAL_1
+    # account_identifier: MYORG-MY_STAGE_ACCOUNT
+    project_name: DCM_DB.PROJECTS.DCM_PROJECT_DEV
+    project_owner: SUMMIT_ADMIN
+    templating_config: DEV
+
+  DCM_STAGE:
+    account_identifier: MYORG-MY_STAGE_ACCOUNT
+    project_name: DCM_DB.PROJECTS.DCM_PROJECT_STG
+    project_owner: SUMMIT_ADMIN
+    templating_config: STAGE
+
+  DCM_PROD:
+    account_identifier: MYORG-MY_PROD_ACCOUNT
+    project_name: DCM_DB.PROJECTS.DCM_PROJECT_PROD
+    project_owner: SUMMIT_ADMIN
+    templating_config: PROD
+
+templating:
+  defaults:
+    wh_size: "X-SMALL"
+    project_owner_role: "SUMMIT_ADMIN"
+
+  configurations:
+    DEV:
+      env_suffix: "_DEV"
+
+    STAGE:
+      env_suffix: "_STAGE"
+
+    PROD:
+      env_suffix: "_PROD"

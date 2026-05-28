@@ -1,0 +1,410 @@
+-- =============================================================================
+-- LAYER 1: Clean dynamic tables (one per RAW table)
+-- Applies: deduplication, TRIM on strings, UPPER on status/type fields
+-- =============================================================================
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_CUSTOMERS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        CUSTOMER_ID,
+        UPPER(TRIM(CUSTOMER_TYPE)) AS CUSTOMER_TYPE,
+        TRIM(FIRST_NAME) AS FIRST_NAME,
+        TRIM(LAST_NAME) AS LAST_NAME,
+        TRIM(COMPANY_NAME) AS COMPANY_NAME,
+        TRIM(TAX_ID) AS TAX_ID,
+        TRIM(EMAIL) AS EMAIL,
+        TRIM(PHONE) AS PHONE,
+        TRIM(ADDRESS) AS ADDRESS,
+        TRIM(CITY) AS CITY,
+        TRIM(POSTAL_CODE) AS POSTAL_CODE,
+        TRIM(COUNTRY) AS COUNTRY,
+        COALESCE(TRIM(PREFERRED_LANGUAGE), 'EN') AS PREFERRED_LANGUAGE,
+        COALESCE(UPPER(TRIM(ACCOUNT_STATUS)), 'ACTIVE') AS ACCOUNT_STATUS,
+        CREATED_AT
+    FROM SUMMIT_DB{{env_suffix}}.RAW.CUSTOMERS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY CUSTOMER_ID ORDER BY CUSTOMER_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_SHIPPING_PRODUCTS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        PRODUCT_ID,
+        TRIM(NAME) AS NAME,
+        TRIM(DESCRIPTION) AS DESCRIPTION,
+        UPPER(TRIM(SERVICE_TYPE)) AS SERVICE_TYPE,
+        MAX_WEIGHT_KG,
+        MAX_LENGTH_CM,
+        MAX_WIDTH_CM,
+        MAX_HEIGHT_CM,
+        UPPER(TRIM(ZONE)) AS ZONE,
+        BASE_PRICE,
+        COALESCE(PRICE_PER_KG, 0) AS PRICE_PER_KG,
+        ESTIMATED_DAYS_MIN,
+        ESTIMATED_DAYS_MAX,
+        COALESCE(INSURANCE_INCLUDED, FALSE) AS INSURANCE_INCLUDED,
+        COALESCE(SIGNATURE_REQUIRED, FALSE) AS SIGNATURE_REQUIRED,
+        COALESCE(ACTIVE, TRUE) AS ACTIVE
+    FROM SUMMIT_DB{{env_suffix}}.RAW.SHIPPING_PRODUCTS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY PRODUCT_ID ORDER BY PRODUCT_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_LOCATIONS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        LOCATION_ID,
+        TRIM(NAME) AS NAME,
+        UPPER(TRIM(TYPE)) AS TYPE,
+        TRIM(ADDRESS) AS ADDRESS,
+        TRIM(CITY) AS CITY,
+        TRIM(COUNTRY) AS COUNTRY,
+        LATITUDE,
+        LONGITUDE,
+        CAPACITY,
+        TRIM(OPERATING_HOURS) AS OPERATING_HOURS,
+        COALESCE(ACTIVE, TRUE) AS ACTIVE
+    FROM SUMMIT_DB{{env_suffix}}.RAW.LOCATIONS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY LOCATION_ID ORDER BY LOCATION_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_ORDERS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        ORDER_ID,
+        CUSTOMER_ID,
+        ORDER_DATE,
+        COALESCE(UPPER(TRIM(STATUS)), 'PENDING') AS STATUS,
+        ORIGIN_LOCATION_ID,
+        TRIM(PICKUP_ADDRESS) AS PICKUP_ADDRESS,
+        TRIM(PICKUP_CITY) AS PICKUP_CITY,
+        TRIM(PICKUP_COUNTRY) AS PICKUP_COUNTRY,
+        TRIM(DESTINATION_ADDRESS) AS DESTINATION_ADDRESS,
+        TRIM(DESTINATION_CITY) AS DESTINATION_CITY,
+        TRIM(DESTINATION_COUNTRY) AS DESTINATION_COUNTRY,
+        ESTIMATED_DELIVERY_DATE,
+        TOTAL_AMOUNT,
+        COALESCE(TRIM(CURRENCY), 'EUR') AS CURRENCY
+    FROM SUMMIT_DB{{env_suffix}}.RAW.ORDERS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY ORDER_ID ORDER BY ORDER_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_ORDER_ITEMS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        ORDER_ITEM_ID,
+        ORDER_ID,
+        PRODUCT_ID,
+        QUANTITY,
+        UNIT_PRICE,
+        DECLARED_WEIGHT_KG,
+        TRIM(DECLARED_CONTENTS) AS DECLARED_CONTENTS,
+        DECLARED_VALUE,
+        COALESCE(INSURANCE_OPTED, FALSE) AS INSURANCE_OPTED
+    FROM SUMMIT_DB{{env_suffix}}.RAW.ORDER_ITEMS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY ORDER_ITEM_ID ORDER BY ORDER_ITEM_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PAYMENTS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        PAYMENT_ID,
+        ORDER_ID,
+        UPPER(TRIM(PAYMENT_METHOD)) AS PAYMENT_METHOD,
+        TRIM(CARD_LAST_FOUR) AS CARD_LAST_FOUR,
+        UPPER(TRIM(CARD_BRAND)) AS CARD_BRAND,
+        TRIM(CARD_COUNTRY) AS CARD_COUNTRY,
+        TRIM(BILLING_ADDRESS) AS BILLING_ADDRESS,
+        TRIM(BILLING_CITY) AS BILLING_CITY,
+        TRIM(BILLING_COUNTRY) AS BILLING_COUNTRY,
+        PAYMENT_AMOUNT,
+        COALESCE(TRIM(CURRENCY), 'EUR') AS CURRENCY,
+        COALESCE(UPPER(TRIM(PAYMENT_STATUS)), 'PENDING') AS PAYMENT_STATUS,
+        PAYMENT_TIMESTAMP,
+        TRIM(IP_ADDRESS) AS IP_ADDRESS,
+        TRIM(DEVICE_FINGERPRINT) AS DEVICE_FINGERPRINT,
+        TRIM(TRANSACTION_REFERENCE) AS TRANSACTION_REFERENCE
+    FROM SUMMIT_DB{{env_suffix}}.RAW.PAYMENTS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY PAYMENT_ID ORDER BY PAYMENT_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PACKAGES
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        PACKAGE_ID,
+        ORDER_ITEM_ID,
+        ORDER_ID,
+        TRIM(TRACKING_NUMBER) AS TRACKING_NUMBER,
+        ACTUAL_WEIGHT_KG,
+        LENGTH_CM,
+        WIDTH_CM,
+        HEIGHT_CM,
+        COALESCE(UPPER(TRIM(PACKAGE_TYPE)), 'BOX') AS PACKAGE_TYPE,
+        COALESCE(UPPER(TRIM(STATUS)), 'PACKED') AS STATUS,
+        CREATED_AT
+    FROM SUMMIT_DB{{env_suffix}}.RAW.PACKAGES
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY PACKAGE_ID ORDER BY PACKAGE_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_TRACKING_EVENTS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        EVENT_ID,
+        PACKAGE_ID,
+        LOCATION_ID,
+        EVENT_TIMESTAMP,
+        UPPER(TRIM(EVENT_TYPE)) AS EVENT_TYPE,
+        UPPER(TRIM(STATUS)) AS STATUS,
+        TRIM(DESCRIPTION) AS DESCRIPTION,
+        TRIM(CARRIER) AS CARRIER
+    FROM SUMMIT_DB{{env_suffix}}.RAW.TRACKING_EVENTS
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY EVENT_ID ORDER BY EVENT_ID) = 1;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_DELIVERIES
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        DELIVERY_ID,
+        PACKAGE_ID,
+        TRIM(DRIVER_NAME) AS DRIVER_NAME,
+        TRIM(VEHICLE_ID) AS VEHICLE_ID,
+        SCHEDULED_DATE,
+        ACTUAL_DELIVERY_DATE,
+        TRIM(RECIPIENT_NAME) AS RECIPIENT_NAME,
+        COALESCE(SIGNATURE_COLLECTED, FALSE) AS SIGNATURE_COLLECTED,
+        TRIM(DELIVERY_NOTES) AS DELIVERY_NOTES,
+        COALESCE(UPPER(TRIM(STATUS)), 'SCHEDULED') AS STATUS
+    FROM SUMMIT_DB{{env_suffix}}.RAW.DELIVERIES
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY DELIVERY_ID ORDER BY DELIVERY_ID) = 1;
+
+-- =============================================================================
+-- LAYER 2: Analytic dynamic tables (read from clean layer)
+-- =============================================================================
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_LOCATION_ACTIVITY
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    WITH event_durations AS (
+        SELECT
+            te.LOCATION_ID,
+            te.PACKAGE_ID,
+            DATE(te.EVENT_TIMESTAMP) AS ACTIVITY_DATE,
+            DATEDIFF('minute',
+                MIN(te.EVENT_TIMESTAMP) OVER (PARTITION BY te.LOCATION_ID, te.PACKAGE_ID),
+                MAX(te.EVENT_TIMESTAMP) OVER (PARTITION BY te.LOCATION_ID, te.PACKAGE_ID)
+            ) AS DWELL_MINUTES
+        FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_TRACKING_EVENTS te
+    )
+    SELECT
+        l.LOCATION_ID,
+        l.NAME AS LOCATION_NAME,
+        l.TYPE AS LOCATION_TYPE,
+        l.CITY,
+        l.COUNTRY,
+        ed.ACTIVITY_DATE,
+        COUNT(DISTINCT ed.PACKAGE_ID) AS NUM_PACKAGES,
+        COUNT(DISTINCT p.ORDER_ID) AS NUM_ORDERS,
+        COUNT(DISTINCT te.EVENT_ID) AS TOTAL_EVENTS,
+        COUNT(DISTINCT CASE WHEN te.EVENT_TYPE = 'ARRIVED_AT_HUB' THEN te.PACKAGE_ID END) AS PACKAGES_ARRIVED,
+        COUNT(DISTINCT CASE WHEN te.EVENT_TYPE = 'DEPARTED_HUB' THEN te.PACKAGE_ID END) AS PACKAGES_DEPARTED,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY ed.DWELL_MINUTES) AS PROCESSING_P75_MINUTES,
+        PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY ed.DWELL_MINUTES) AS PROCESSING_P90_MINUTES,
+        PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY ed.DWELL_MINUTES) AS PROCESSING_P99_MINUTES,
+        MIN(te.EVENT_TIMESTAMP) AS FIRST_EVENT_AT,
+        MAX(te.EVENT_TIMESTAMP) AS LAST_EVENT_AT
+    FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_LOCATIONS l
+    JOIN event_durations ed ON l.LOCATION_ID = ed.LOCATION_ID
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_TRACKING_EVENTS te ON l.LOCATION_ID = te.LOCATION_ID AND DATE(te.EVENT_TIMESTAMP) = ed.ACTIVITY_DATE
+    LEFT JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PACKAGES p ON te.PACKAGE_ID = p.PACKAGE_ID
+    GROUP BY l.LOCATION_ID, l.NAME, l.TYPE, l.CITY, l.COUNTRY, ed.ACTIVITY_DATE;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_ORDER_SUMMARY
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        o.ORDER_ID,
+        COALESCE(c.COMPANY_NAME, c.FIRST_NAME || ' ' || c.LAST_NAME) AS CUSTOMER_NAME,
+        c.CITY AS CUSTOMER_CITY,
+        c.COUNTRY AS CUSTOMER_COUNTRY,
+        o.ORDER_DATE,
+        o.STATUS AS ORDER_STATUS,
+        o.DESTINATION_CITY,
+        o.DESTINATION_COUNTRY,
+        o.ESTIMATED_DELIVERY_DATE,
+        COUNT(oi.ORDER_ITEM_ID) AS TOTAL_ITEMS,
+        SUM(oi.QUANTITY) AS TOTAL_QUANTITY,
+        SUM(oi.QUANTITY * oi.UNIT_PRICE) AS ORDER_VALUE,
+        COUNT(DISTINCT p.PACKAGE_ID) AS TOTAL_PACKAGES,
+        MAX(d.ACTUAL_DELIVERY_DATE) AS ACTUAL_DELIVERY_DATE,
+        DATEDIFF('day', o.ORDER_DATE, COALESCE(MAX(d.ACTUAL_DELIVERY_DATE), CURRENT_TIMESTAMP())) AS DAYS_SINCE_ORDER
+    FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_ORDERS o
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_CUSTOMERS c ON o.CUSTOMER_ID = c.CUSTOMER_ID
+    LEFT JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_ORDER_ITEMS oi ON o.ORDER_ID = oi.ORDER_ID
+    LEFT JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PACKAGES p ON o.ORDER_ID = p.ORDER_ID
+    LEFT JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_DELIVERIES d ON p.PACKAGE_ID = d.PACKAGE_ID
+    GROUP BY o.ORDER_ID, COALESCE(c.COMPANY_NAME, c.FIRST_NAME || ' ' || c.LAST_NAME), c.CITY, c.COUNTRY, o.ORDER_DATE, o.STATUS,
+             o.DESTINATION_CITY, o.DESTINATION_COUNTRY, o.ESTIMATED_DELIVERY_DATE;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_PACKAGE_TRACKING
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        p.PACKAGE_ID,
+        p.TRACKING_NUMBER,
+        p.STATUS AS PACKAGE_STATUS,
+        p.PACKAGE_TYPE,
+        p.ACTUAL_WEIGHT_KG,
+        o.ORDER_ID,
+        COALESCE(c.COMPANY_NAME, c.FIRST_NAME || ' ' || c.LAST_NAME) AS CUSTOMER_NAME,
+        o.DESTINATION_CITY,
+        o.DESTINATION_COUNTRY,
+        COUNT(te.EVENT_ID) AS TOTAL_TRACKING_EVENTS,
+        COUNT(DISTINCT te.LOCATION_ID) AS HUBS_VISITED,
+        MIN(te.EVENT_TIMESTAMP) AS FIRST_SCAN,
+        MAX(te.EVENT_TIMESTAMP) AS LAST_SCAN,
+        DATEDIFF('hour', MIN(te.EVENT_TIMESTAMP), MAX(te.EVENT_TIMESTAMP)) AS TRANSIT_HOURS,
+        MAX(CASE WHEN te.EVENT_TYPE = 'DELIVERED' THEN te.EVENT_TIMESTAMP END) AS DELIVERED_AT,
+        MAX(te.CARRIER) AS CARRIER
+    FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PACKAGES p
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_ORDERS o ON p.ORDER_ID = o.ORDER_ID
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_CUSTOMERS c ON o.CUSTOMER_ID = c.CUSTOMER_ID
+    LEFT JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_TRACKING_EVENTS te ON p.PACKAGE_ID = te.PACKAGE_ID
+    GROUP BY p.PACKAGE_ID, p.TRACKING_NUMBER, p.STATUS, p.PACKAGE_TYPE, p.ACTUAL_WEIGHT_KG,
+             o.ORDER_ID, COALESCE(c.COMPANY_NAME, c.FIRST_NAME || ' ' || c.LAST_NAME), o.DESTINATION_CITY, o.DESTINATION_COUNTRY;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_PACKAGE_HOPS
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    WITH ordered_events AS (
+        SELECT
+            te.EVENT_ID,
+            te.PACKAGE_ID,
+            te.LOCATION_ID,
+            l.NAME AS LOCATION_NAME,
+            l.CITY AS LOCATION_CITY,
+            l.COUNTRY AS LOCATION_COUNTRY,
+            l.TYPE AS LOCATION_TYPE,
+            te.EVENT_TIMESTAMP,
+            te.EVENT_TYPE,
+            te.STATUS,
+            te.DESCRIPTION,
+            te.CARRIER,
+            ROW_NUMBER() OVER (PARTITION BY te.PACKAGE_ID ORDER BY te.EVENT_TIMESTAMP) AS HOP_NUMBER,
+            LAG(te.EVENT_TIMESTAMP) OVER (PARTITION BY te.PACKAGE_ID ORDER BY te.EVENT_TIMESTAMP) AS PREV_EVENT_TIMESTAMP,
+            LAG(l.NAME) OVER (PARTITION BY te.PACKAGE_ID ORDER BY te.EVENT_TIMESTAMP) AS PREV_LOCATION_NAME
+        FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_TRACKING_EVENTS te
+        LEFT JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_LOCATIONS l ON te.LOCATION_ID = l.LOCATION_ID
+    )
+    SELECT
+        oe.PACKAGE_ID,
+        p.TRACKING_NUMBER,
+        oe.HOP_NUMBER,
+        oe.EVENT_ID,
+        oe.EVENT_TIMESTAMP,
+        oe.EVENT_TYPE,
+        oe.STATUS,
+        oe.LOCATION_ID,
+        oe.LOCATION_NAME,
+        oe.LOCATION_CITY,
+        oe.LOCATION_COUNTRY,
+        oe.LOCATION_TYPE,
+        oe.PREV_LOCATION_NAME,
+        oe.CARRIER,
+        oe.DESCRIPTION,
+        DATEDIFF('minute', oe.PREV_EVENT_TIMESTAMP, oe.EVENT_TIMESTAMP) AS MINUTES_SINCE_PREV_HOP,
+        DATEDIFF('minute', FIRST_VALUE(oe.EVENT_TIMESTAMP) OVER (PARTITION BY oe.PACKAGE_ID ORDER BY oe.HOP_NUMBER), oe.EVENT_TIMESTAMP) AS CUMULATIVE_MINUTES
+    FROM ordered_events oe
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PACKAGES p ON oe.PACKAGE_ID = p.PACKAGE_ID;
+
+define dynamic table SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_FRAUD_DETECTION
+    target_lag = '1 minute'
+    warehouse = 'SUMMIT_WH{{env_suffix}}'
+    refresh_mode = AUTO
+    initialize = ON_CREATE
+as
+    SELECT
+        fr.PAYMENT_ID,
+        fr.ORDER_ID,
+        fr.CUSTOMER_ID,
+        COALESCE(c.COMPANY_NAME, c.FIRST_NAME || ' ' || c.LAST_NAME) AS CUSTOMER_NAME,
+        c.COUNTRY AS CUSTOMER_COUNTRY,
+        c.CITY AS CUSTOMER_CITY,
+        pay.PAYMENT_METHOD,
+        pay.CARD_LAST_FOUR,
+        pay.CARD_BRAND,
+        pay.CARD_COUNTRY,
+        pay.BILLING_COUNTRY,
+        fr.PAYMENT_AMOUNT,
+        pay.CURRENCY,
+        pay.PAYMENT_STATUS,
+        fr.PAYMENT_TIMESTAMP,
+        pay.IP_ADDRESS,
+        pay.DEVICE_FINGERPRINT,
+        pay.TRANSACTION_REFERENCE,
+        o.STATUS AS ORDER_STATUS,
+        o.DESTINATION_CITY,
+        o.DESTINATION_COUNTRY,
+        fr.FRAUD_SCORE,
+        fr.IS_FRAUD,
+        fr.FRAUD_SIGNALS,
+        fr.SCORED_AT
+    FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.FRAUD_DETECTION_RESULTS fr
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PAYMENTS pay ON fr.PAYMENT_ID = pay.PAYMENT_ID
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_ORDERS o ON fr.ORDER_ID = o.ORDER_ID
+    JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_CUSTOMERS c ON fr.CUSTOMER_ID = c.CUSTOMER_ID;
+
+-- =============================================================================
+-- Standalone tables (populated by external processes, e.g. notebooks)
+-- =============================================================================
+
+define table SUMMIT_DB{{env_suffix}}.TRANSFORM.FRAUD_DETECTION_RESULTS (
+    PAYMENT_ID NUMBER,
+    ORDER_ID NUMBER,
+    CUSTOMER_ID NUMBER,
+    FRAUD_SCORE FLOAT,
+    IS_FRAUD BOOLEAN,
+    FRAUD_SIGNALS VARCHAR,
+    FRAUD_TYPE VARCHAR,
+    EXPLANATION VARCHAR,
+    PAYMENT_AMOUNT NUMBER(10,2),
+    PAYMENT_TIMESTAMP TIMESTAMP_NTZ,
+    SCORED_AT TIMESTAMP_NTZ
+);

@@ -1,0 +1,96 @@
+[
+  {
+    "payment": {
+      "payment_id": 101,
+      "order_id": 201,
+      "payment_method": "CREDIT_CARD",
+      "card_last_four": "4532",
+      "card_brand": "VISA",
+      "card_country": "Germany",
+      "billing_address": "Street 42",
+      "billing_city": "Berlin",
+      "billing_country": "Germany",
+      "payment_amount": 89.90,
+      "currency": "EUR",
+      "payment_status": "COMPLETED",
+      "payment_timestamp": "2026-05-21T10:15:30+00:00",
+      "ip_address": "91.23.142.55",
+      "device_fingerprint": "fp_a1b2c3d4",
+      "transaction_reference": "TXN-2026-000201"
+    },
+    "order": {
+      "order_id": 201,
+      "customer_id": 1,
+      "order_date": "2026-05-21T10:14:00+00:00",
+      "status": "CONFIRMED",
+      "total_amount": 89.90
+    },
+    "items": [
+      {"order_item_id": 301, "declared_value": 450.00, "declared_contents": "Electronics components"}
+    ],
+    "customer": {"id": 1, "country": "Germany", "city": "Berlin", "name": "Schneider Electronics GmbH"}
+  },
+  {
+    "payment": {
+      "payment_id": 102,
+      "order_id": 202,
+      "payment_method": "CREDIT_CARD",
+      "card_last_four": "8821",
+      "card_brand": "MASTERCARD",
+      "card_country": "Romania",
+      "billing_address": "Street 7",
+      "billing_city": "Paris",
+      "billing_country": "Romania",
+      "payment_amount": 2499.00,
+      "currency": "EUR",
+      "payment_status": "COMPLETED",
+      "payment_timestamp": "2026-05-21T10:18:45+00:00",
+      "ip_address": "79.114.22.88",
+      "device_fingerprint": "fp_fraud_002",
+      "transaction_reference": "TXN-2026-000202"
+    },
+    "order": {
+      "order_id": 202,
+      "customer_id": 2,
+      "order_date": "2026-05-21T10:17:00+00:00",
+      "status": "CONFIRMED",
+      "total_amount": 2499.00
+    },
+    "items": [
+      {"order_item_id": 302, "declared_value": 12000.00, "declared_contents": "Lab equipment"},
+      {"order_item_id": 303, "declared_value": 15000.00, "declared_contents": "Medical devices"}
+    ],
+    "customer": {"id": 2, "country": "France", "city": "Paris", "name": "Marie Dupont"}
+  },
+  {
+    "payment": {
+      "payment_id": 103,
+      "order_id": 203,
+      "payment_method": "DEBIT_CARD",
+      "card_last_four": "1199",
+      "card_brand": "MAESTRO",
+      "card_country": "Netherlands",
+      "billing_address": "Street 15",
+      "billing_city": "Amsterdam",
+      "billing_country": "Netherlands",
+      "payment_amount": 34.90,
+      "currency": "EUR",
+      "payment_status": "COMPLETED",
+      "payment_timestamp": "2026-05-21T10:22:10+00:00",
+      "ip_address": "145.90.88.12",
+      "device_fingerprint": "fp_e5f6g7h8",
+      "transaction_reference": "TXN-2026-000203"
+    },
+    "order": {
+      "order_id": 203,
+      "customer_id": 3,
+      "order_date": "2026-05-21T10:21:00+00:00",
+      "status": "CONFIRMED",
+      "total_amount": 34.90
+    },
+    "items": [
+      {"order_item_id": 304, "declared_value": 200.00, "declared_contents": "Office supplies"}
+    ],
+    "customer": {"id": 3, "country": "Netherlands", "city": "Amsterdam", "name": "Van der Berg Imports BV"}
+  }
+]

@@ -1,0 +1,21 @@
+Task: Create a semantic view named SUMMIT_DB_DEV.ANALYTICS.TMS_SEMANTIC_VIEW over the following views in the ANALYTICS schema of SUMMIT_DB_DEV:
+
+- ORDER_SUMMARY
+- PACKAGE_TRACKING
+- PACKAGE_HOPS
+- LOCATION_ACTIVITY
+- FRAUD_DETECTION
+
+Requirements:
+1. Add meaningful descriptions to the semantic view itself and to every table, column, dimension, and metric so that Cortex Analyst understands the business context of a Transportation Management System (TMS) for a pan-European shipping company.
+2. Define appropriate relationships (joins) between the tables based on shared keys (ORDER_ID, PACKAGE_ID, CUSTOMER_NAME, etc.).
+3. Add at least 3 verified queries (examples) that demonstrate how to use the semantic view:
+   - "Which packages are currently in transit and how many hubs have they visited?"
+   - "Show me the top 5 locations with the highest P90 processing time today"
+   - "List all fraudulent payments detected in the last 7 days with their fraud signals and scores"
+
+Rules:
+Start the SQL file with `USE ROLE SUMMIT_ADMIN;` and `USE WAREHOUSE SUMMIT_WH_DEV;`.
+Create only a sql file and save it locally. 
+Use the local repository to get information about schema objects. 
+Do not try to run snowflake statements. Do not run the SQL yet.

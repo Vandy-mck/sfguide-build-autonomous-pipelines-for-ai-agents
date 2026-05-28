@@ -1,0 +1,28 @@
+Build a Streamlit in Snowflake (SiS) app for the EuroShip Logistics TMS system.
+
+The app should connect to SUMMIT_DB_DEV.ANALYTICS and provide:
+
+1. **Dashboard page** — Key KPIs at the top (total orders, packages in transit, fraud alerts, avg transit hours), followed by charts showing:
+   - Orders over time (line chart)
+   - Package status distribution (bar chart)
+   - Top 10 busiest hubs by package volume (horizontal bar chart)
+
+2. **Package Tracking page** — A searchable table of all packages with filters for status (IN_TRANSIT, DELIVERED, etc.) and carrier. Show tracking number, customer, destination, status, hubs visited, and transit hours.
+
+3. **Fraud Alerts page** — A table of flagged fraudulent payments with fraud score, fraud type, triggered signals, and the AI-generated explanation. Add a filter for minimum fraud score threshold (slider from 0.3 to 1.0).
+
+4. **Location Performance page** — A table and bar chart of hub/warehouse performance metrics: location name, type, city, country, number of packages processed, and P90 processing time in minutes. Add date filter.
+
+Requirements:
+- Use the role SUMMIT_ADMIN and warehouse SUMMIT_WH_DEV.
+- Query these views: ORDER_SUMMARY, PACKAGE_TRACKING, FRAUD_DETECTION, LOCATION_ACTIVITY.
+- Use st.connection("snowflake") for the Snowflake connection.
+- Use Streamlit's built-in charting (st.bar_chart, st.line_chart) or st.altair_chart for more control.
+- Add a sidebar with page navigation using st.navigation and st.Page.
+- Apply clean formatting with st.metric for KPIs.
+- The app title should be "EuroShip Logistics — TMS Operations".
+
+Rules:
+- Create only the Python app file and save it locally as `7_streamlit/tms_app.py`.
+- Do not deploy the app yet.
+- Use the local repository to get information about schema objects and column names.

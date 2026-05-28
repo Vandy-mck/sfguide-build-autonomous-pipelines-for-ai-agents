@@ -1,0 +1,15 @@
+Create a Cortex Agent named SUMMIT_DB_DEV.ANALYTICS.TMS_AGENT that uses the semantic view SUMMIT_DB_DEV.ANALYTICS.TMS_SEMANTIC_VIEW as its data source.
+
+Requirements:
+1. The agent should be able to answer natural language questions about the TMS (Transportation Management System) data: orders, package tracking, logistics hub performance, and fraud detection.
+2. Give the agent a clear description and instructions so it understands it serves a pan-European shipping company called EuroShip Logistics.
+3. The agent should respond concisely and include relevant data in its answers.
+
+After creating the agent, provide 3 example prompts to demonstrate how to use it:
+- "Which packages are currently delayed and where are they stuck?"
+- "What is our fraud detection rate this week compared to last week?"
+- "Show me the busiest hubs today and their average processing times"
+
+Rules:
+Create only a SQL file and save it locally. Do not run the SQL yet.
+Use the local repository to get information about schema objects.

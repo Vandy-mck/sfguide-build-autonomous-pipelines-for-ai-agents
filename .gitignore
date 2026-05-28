@@ -1,0 +1,12 @@
+.env
+.venv/
+.env/
+.snowflake/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+2_dcm_project/out
+3_generate/.tms_producer_state.json
+ignore
