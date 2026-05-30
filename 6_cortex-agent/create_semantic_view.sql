@@ -58,31 +58,31 @@ CREATE OR REPLACE SEMANTIC VIEW SUMMIT_DB_DEV.ANALYTICS.TMS_SEMANTIC_VIEW
   )
 
   FACTS (
-    order_summary.ORDER_VALUE
+    order_summary.ORDER_VALUE AS ORDER_VALUE
       COMMENT = 'Order value in EUR for aggregation',
-    order_summary.TOTAL_ITEMS
+    order_summary.TOTAL_ITEMS AS TOTAL_ITEMS
       COMMENT = 'Number of items in the order',
-    order_summary.TOTAL_PACKAGES
+    order_summary.TOTAL_PACKAGES AS TOTAL_PACKAGES
       COMMENT = 'Number of packages in the order',
-    order_summary.DAYS_SINCE_ORDER
+    order_summary.DAYS_SINCE_ORDER AS DAYS_SINCE_ORDER
       COMMENT = 'Days elapsed since the order was placed',
-    package_tracking.TRANSIT_HOURS
+    package_tracking.TRANSIT_HOURS AS TRANSIT_HOURS
       COMMENT = 'Transit hours for a single package',
-    package_tracking.HUBS_VISITED
+    package_tracking.HUBS_VISITED AS HUBS_VISITED
       COMMENT = 'Number of hubs visited by the package',
-    location_activity.NUM_PACKAGES
+    location_activity.NUM_PACKAGES AS NUM_PACKAGES
       COMMENT = 'Number of packages processed at the location on this day',
-    location_activity.PACKAGES_ARRIVED
+    location_activity.PACKAGES_ARRIVED AS PACKAGES_ARRIVED
       COMMENT = 'Packages that arrived at this location on this day',
-    location_activity.PACKAGES_DEPARTED
+    location_activity.PACKAGES_DEPARTED AS PACKAGES_DEPARTED
       COMMENT = 'Packages that departed from this location on this day',
-    location_activity.PROCESSING_P90_MINUTES
+    location_activity.PROCESSING_P90_MINUTES AS PROCESSING_P90_MINUTES
       COMMENT = 'P90 processing time in minutes at this location',
-    package_hops.MINUTES_SINCE_PREV_HOP
+    package_hops.MINUTES_SINCE_PREV_HOP AS MINUTES_SINCE_PREV_HOP
       COMMENT = 'Minutes elapsed since the previous hop',
-    fraud_detection.FRAUD_SCORE
+    fraud_detection.FRAUD_SCORE AS FRAUD_SCORE
       COMMENT = 'Fraud score (0.0 to 1.0) assigned by the heuristic scorer',
-    fraud_detection.PAYMENT_AMOUNT
+    fraud_detection.PAYMENT_AMOUNT AS PAYMENT_AMOUNT
       COMMENT = 'Payment amount in EUR'
   )
 
@@ -175,7 +175,7 @@ CREATE OR REPLACE SEMANTIC VIEW SUMMIT_DB_DEV.ANALYTICS.TMS_SEMANTIC_VIEW
       COMMENT = 'Total value of all orders in EUR',
     order_summary.avg_order_value AS AVG(ORDER_VALUE)
       COMMENT = 'Average order value in EUR',
-    order_summary.total_packages AS SUM(TOTAL_PACKAGES)
+    order_summary.total_packages_sum AS SUM(TOTAL_PACKAGES)
       COMMENT = 'Total number of packages across all orders',
     order_summary.avg_days_since_order AS AVG(DAYS_SINCE_ORDER)
       COMMENT = 'Average number of days since order was placed',

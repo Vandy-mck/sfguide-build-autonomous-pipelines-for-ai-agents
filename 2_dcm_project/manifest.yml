@@ -6,8 +6,7 @@ default_target: DCM_DEV
 
 targets:
   DCM_DEV:
-    account_identifier: SFPSCOGS-OVI_HUTU_AWS_EU_CENTRAL_1
-    # account_identifier: MYORG-MY_STAGE_ACCOUNT
+    account_identifier: MYORG-MY_STAGE_ACCOUNT
     project_name: DCM_DB.PROJECTS.DCM_PROJECT_DEV
     project_owner: SUMMIT_ADMIN
     templating_config: DEV

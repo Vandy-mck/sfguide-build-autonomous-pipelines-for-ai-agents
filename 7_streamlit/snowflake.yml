@@ -1,0 +1,11 @@
+definition_version: 2
+
+entities:
+  tms_operations_app:
+    type: streamlit
+    identifier:
+      name: TMS_OPERATIONS_APP
+      schema: ANALYTICS
+    main_file: tms_app.py
+    query_warehouse: SUMMIT_WH_DEV
+    title: "EuroShip Logistics — TMS Operations"

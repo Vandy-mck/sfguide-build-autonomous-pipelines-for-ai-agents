@@ -385,6 +385,8 @@ as
         fr.FRAUD_SCORE,
         fr.IS_FRAUD,
         fr.FRAUD_SIGNALS,
+        fr.FRAUD_TYPE,
+        fr.EXPLANATION,
         fr.SCORED_AT
     FROM SUMMIT_DB{{env_suffix}}.TRANSFORM.FRAUD_DETECTION_RESULTS fr
     JOIN SUMMIT_DB{{env_suffix}}.TRANSFORM.DT_CLEAN_PAYMENTS pay ON fr.PAYMENT_ID = pay.PAYMENT_ID

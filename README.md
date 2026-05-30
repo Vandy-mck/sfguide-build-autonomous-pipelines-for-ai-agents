@@ -14,6 +14,7 @@ Stream real-time data from a Kafka endpoint using the Openflow Kafka connector. 
 | [`4_openflow/`](4_openflow/README.md) | Openflow connector configuration for Kafka ingestion |
 | [`5_fraud_detection/`](5_fraud_detection/README.md) | AI-powered fraud detection — heuristic scorer + Cortex AI enrichment (AI_CLASSIFY, AI_COMPLETE) |
 | [`6_cortex-agent/`](6_cortex-agent/) | Semantic view creation and Cortex Agent (SQL + Cortex Code prompts) |
+| [`7_streamlit/`](7_streamlit/) | Streamlit in Snowflake operations dashboard (Cortex Code prompt) |
 | [`helpers/`](helpers/README.md) | Reference and helper scripts |
 | `assets/` | Screenshots and diagrams for the quickstart |
 
