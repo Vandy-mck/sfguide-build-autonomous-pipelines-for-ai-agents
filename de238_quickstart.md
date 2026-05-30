@@ -56,6 +56,18 @@ The diagram below shows the end-to-end architecture you'll build in this lab:
 ![Lab Architecture](assets/lab_architecture.png)
 
 <!-- ------------------------ -->
+## Clone the Companion Git Repo
+
+This guide has a companion repository that contains all the code, configuration files, and scripts you'll need. Clone it to your local machine and use it as your working directory throughout the lab.
+
+```bash
+git clone https://github.com/Snowflake-Labs/sfguide-build-autonomous-pipelines-for-ai-agents
+cd sfguide-build-autonomous-pipelines-for-ai-agents
+```
+
+The repository includes the DCM project definitions, Kafka producer/consumer scripts, fraud detection notebook, Cortex Agent SQL, Streamlit app, and helper scripts referenced in each step.
+
+<!-- ------------------------ -->
 ## Bootstrap the Account
 
 > **Note:** This step has been already completed in your account as part of the Summit provisioning. Run this only if you intend to run the hands-on lab in your own Snowflake account.
