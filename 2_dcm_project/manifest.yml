@@ -6,7 +6,7 @@ default_target: DCM_DEV
 
 targets:
   DCM_DEV:
-    account_identifier: MYORG-MY_STAGE_ACCOUNT
+    account_identifier: SFSEHOL-SUMMIT_26_DE238_XXWZNW
     project_name: DCM_DB.PROJECTS.DCM_PROJECT_DEV
     project_owner: SUMMIT_ADMIN
     templating_config: DEV
